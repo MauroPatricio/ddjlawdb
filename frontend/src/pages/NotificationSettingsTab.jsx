@@ -87,8 +87,8 @@ export const NotificationSettingsTab = () => {
     <div className="card" style={{ padding: '1.75rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: '700', color: 'white', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Bell size={22} color="#38bdf8" /> Configurações de Notificações de Expiração
+          <h3 style={{ fontSize: '1.2rem', fontWeight: '700', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Bell size={22} color="#0284c7" /> Configurações de Notificações de Expiração
           </h3>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '0.25rem' }}>
             Defina o email de destino, a hora de envio, o período e a antecedência em dias para notificar registos a expirar.
@@ -110,9 +110,9 @@ export const NotificationSettingsTab = () => {
       {msg.text && (
         <div
           style={{
-            background: msg.type === 'success' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(244, 63, 94, 0.15)',
-            border: `1px solid ${msg.type === 'success' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(244, 63, 94, 0.3)'}`,
-            color: msg.type === 'success' ? '#a7f3d0' : '#fda4af',
+            background: msg.type === 'success' ? '#ecfdf5' : '#fff1f2',
+            border: `1px solid ${msg.type === 'success' ? '#a7f3d0' : '#fecdd3'}`,
+            color: msg.type === 'success' ? '#047857' : '#e11d48',
             padding: '0.85rem 1rem',
             borderRadius: 'var(--radius-sm)',
             marginBottom: '1.5rem',
@@ -132,7 +132,7 @@ export const NotificationSettingsTab = () => {
           {/* Email de Notificação */}
           <div style={{ gridColumn: 'span 2' }}>
             <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '0.4rem' }}>
-              <Mail size={15} color="#38bdf8" /> Email de Destino para Notificações
+              <Mail size={15} color="#0284c7" /> Email de Destino para Notificações
             </label>
             <input
               type="email"
@@ -203,7 +203,7 @@ export const NotificationSettingsTab = () => {
         </div>
 
         {/* Checkbox de Ativar / Desativar */}
-        <div style={{ background: '#0f172a', padding: '1rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <input
             type="checkbox"
             id="notificationsEnabled"
@@ -211,7 +211,7 @@ export const NotificationSettingsTab = () => {
             onChange={(e) => setNotificationsEnabled(e.target.checked)}
             style={{ width: '18px', height: '18px', cursor: 'pointer' }}
           />
-          <label htmlFor="notificationsEnabled" style={{ cursor: 'pointer', fontSize: '0.9rem', color: 'white', fontWeight: '500' }}>
+          <label htmlFor="notificationsEnabled" style={{ cursor: 'pointer', fontSize: '0.9rem', color: 'var(--text-main)', fontWeight: '500' }}>
             Ativar envio automático de alertas por email para registos prestes a expirar
           </label>
         </div>

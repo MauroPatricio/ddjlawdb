@@ -65,16 +65,16 @@ export const UserManagementTab = () => {
   };
 
   const getRoleBadge = (role) => {
-    if (role === 'admin') return <span className="badge-tag" style={{ background: '#78350f', color: '#fef3c7', border: '1px solid #b45309' }}>👑 ADMIN</span>;
-    if (role === 'gestor') return <span className="badge-tag" style={{ background: '#1e3a8a', color: '#bfdbfe', border: '1px solid #1d4ed8' }}>🛠️ GESTOR</span>;
-    return <span className="badge-tag" style={{ background: '#334155', color: '#cbd5e1' }}>👁️ LEITOR</span>;
+    if (role === 'admin') return <span className="badge-tag" style={{ background: '#fef3c7', color: '#b45309', border: '1px solid #fde047' }}>👑 ADMIN</span>;
+    if (role === 'gestor') return <span className="badge-tag" style={{ background: '#dbeafe', color: '#1e40af', border: '1px solid #93c5fd' }}>🛠️ GESTOR</span>;
+    return <span className="badge-tag" style={{ background: '#f1f5f9', color: '#475569', border: '1px solid #cbd5e1' }}>👁️ LEITOR</span>;
   };
 
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
         <div>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: '700', color: 'white' }}>Gestão de Utilizadores & Contas</h2>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--text-main)' }}>Gestão de Utilizadores & Contas</h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
             Administração de contas, alteração de níveis de acesso RBAC e estado de ativação
           </p>
@@ -105,7 +105,7 @@ export const UserManagementTab = () => {
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
             <thead>
-              <tr style={{ background: '#0f172a', borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)' }}>
+              <tr style={{ background: '#f8fafc', borderBottom: '2px solid var(--border-color)', color: '#475569' }}>
                 <th style={{ padding: '0.85rem 1rem' }}>Utilizador</th>
                 <th style={{ padding: '0.85rem 1rem' }}>Email</th>
                 <th style={{ padding: '0.85rem 1rem' }}>Papel RBAC</th>
@@ -129,8 +129,8 @@ export const UserManagementTab = () => {
               ) : (
                 users.map((u) => (
                   <tr key={u._id} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                    <td style={{ padding: '0.85rem 1rem', fontWeight: '600', color: 'white' }}>
-                      {u.name} {u._id === currentUser._id && <span style={{ fontSize: '0.75rem', color: '#06b6d4' }}>(Você)</span>}
+                    <td style={{ padding: '0.85rem 1rem', fontWeight: '600', color: 'var(--text-main)' }}>
+                      {u.name} {u._id === currentUser._id && <span style={{ fontSize: '0.75rem', color: '#0284c7' }}>(Você)</span>}
                     </td>
                     <td style={{ padding: '0.85rem 1rem', color: 'var(--text-muted)' }}>{u.email}</td>
                     <td style={{ padding: '0.85rem 1rem' }}>{getRoleBadge(u.role)}</td>

@@ -117,7 +117,8 @@ export const InformationFormModal = ({ isOpen, onClose, onSave, initialData }) =
       left: 0,
       right: 0,
       bottom: 0,
-      background: 'rgba(0, 0, 0, 0.75)',
+      background: 'rgba(15, 23, 42, 0.6)',
+      backdropFilter: 'blur(4px)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -136,8 +137,8 @@ export const InformationFormModal = ({ isOpen, onClose, onSave, initialData }) =
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           {/* Secção de Upload de Ficheiro Logotipo (Imagem) - Primeiro Campo */}
-          <div style={{ background: '#0f172a', padding: '1.25rem', borderRadius: 'var(--radius-md)', border: '1px dashed #0284c7' }}>
-            <label style={{ fontSize: '0.85rem', color: '#38bdf8', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '0.5rem' }}>
+          <div style={{ background: '#f8fafc', padding: '1.25rem', borderRadius: 'var(--radius-md)', border: '1px dashed #0284c7' }}>
+            <label style={{ fontSize: '0.85rem', color: '#0284c7', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '0.5rem' }}>
               <ImageIcon size={16} /> Carregar Logotipo da Marca (Imagem PNG, JPG, WEBP)
             </label>
             <input
@@ -153,7 +154,7 @@ export const InformationFormModal = ({ isOpen, onClose, onSave, initialData }) =
                   alt="Pré-visualização do Logotipo"
                   style={{ width: '60px', height: '60px', objectFit: 'contain', background: '#ffffff', borderRadius: '6px', padding: '4px', border: '1px solid #cbd5e1' }}
                 />
-                <span style={{ fontSize: '0.8rem', color: '#4ade80' }}>✓ Logotipo pronto para guardar</span>
+                <span style={{ fontSize: '0.8rem', color: '#16a34a', fontWeight: '600' }}>✓ Logotipo pronto para guardar</span>
               </div>
             )}
           </div>
@@ -220,7 +221,7 @@ export const InformationFormModal = ({ isOpen, onClose, onSave, initialData }) =
 
             <div>
               <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '0.4rem' }}>
-                <Calendar size={14} color="#38bdf8" /> Data Registo
+                <Calendar size={14} color="#0284c7" /> Data Registo
               </label>
               <input
                 type="date"
@@ -313,8 +314,8 @@ export const InformationFormModal = ({ isOpen, onClose, onSave, initialData }) =
           </div>
 
           {/* Secção de Upload de Documento PDF */}
-          <div style={{ background: '#0f172a', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px dashed #475569' }}>
-            <label style={{ fontSize: '0.85rem', color: '#38bdf8', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '0.5rem' }}>
+          <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px dashed #cbd5e1' }}>
+            <label style={{ fontSize: '0.85rem', color: '#0284c7', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '0.5rem' }}>
               <Upload size={16} /> Anexar Ficheiro Documento (Formato PDF)
             </label>
             <input

@@ -40,11 +40,11 @@ export const Sidebar = ({ activeTab, setActiveTab }) => {
 
       {/* User Info Card (Idêntico ao da Foto 2) */}
       <div style={{
-        background: 'rgba(30, 41, 59, 0.7)',
+        background: 'rgba(255, 255, 255, 0.05)',
         borderRadius: 'var(--radius-md)',
         padding: '0.85rem',
         marginBottom: '1.5rem',
-        border: '1px solid var(--border-color)',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
         display: 'flex',
         alignItems: 'center',
         gap: '0.75rem'
@@ -79,9 +79,9 @@ export const Sidebar = ({ activeTab, setActiveTab }) => {
           type="text"
           placeholder="Procurar..."
           className="input-field"
-          style={{ paddingLeft: '2.25rem', fontSize: '0.85rem', padding: '0.5rem 0.75rem 0.5rem 2.25rem' }}
+          style={{ paddingLeft: '2.25rem', fontSize: '0.85rem', padding: '0.5rem 0.75rem 0.5rem 2.25rem', background: '#1e293b', color: '#ffffff', border: '1px solid #334155' }}
         />
-        <Search size={14} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+        <Search size={14} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
       </div>
 
       {/* Menu de Navegação */}

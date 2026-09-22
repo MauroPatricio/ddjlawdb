@@ -25,7 +25,7 @@ export const DashboardTab = () => {
 
   return (
     <div>
-      <h1 style={{ fontSize: '1.75rem', fontWeight: '700', marginBottom: '0.25rem', color: 'white' }}>Painel Principal (Dashboard)</h1>
+      <h1 style={{ fontSize: '1.75rem', fontWeight: '700', marginBottom: '0.25rem', color: 'var(--text-main)' }}>Painel Principal (Dashboard)</h1>
       <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', fontSize: '0.85rem' }}>
         Resumo estatístico do sistema SIGINFO - DDJ LAW
       </p>

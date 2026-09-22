@@ -1,16 +1,16 @@
 :root {
-  --bg-main: #0f172a;
-  --bg-card: #1e293b;
-  --bg-card-hover: #334155;
-  --border-color: #334155;
+  --bg-main: #f1f5f9;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f8fafc;
+  --border-color: #e2e8f0;
   --primary: #0284c7;
   --primary-hover: #0369a1;
   --accent-cyan: #06b6d4;
   --accent-emerald: #10b981;
   --accent-amber: #f59e0b;
   --accent-rose: #f43f5e;
-  --text-main: #f8fafc;
-  --text-muted: #94a3b8;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
   --font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --radius-sm: 6px;
   --radius-md: 10px;
@@ -66,13 +66,13 @@ body {
 .brand-title {
   font-size: 1.6rem;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--text-main);
 }
 
 .badge-tag {
-  background: #334155;
-  border: 1px solid #475569;
-  color: #bae6fd;
+  background: #e2e8f0;
+  border: 1px solid #cbd5e1;
+  color: #0369a1;
   padding: 0.2rem 0.6rem;
   border-radius: 9999px;
   font-size: 0.75rem;
@@ -92,6 +92,7 @@ body {
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   padding: 1.25rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
 }
 
 .card-title {
@@ -143,6 +144,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
+  transition: background 0.15s ease;
 }
 
 .btn-primary:hover {
@@ -150,56 +152,64 @@ body {
 }
 
 .btn-secondary {
-  background: #334155;
-  color: var(--text-main);
-  border: 1px solid #475569;
+  background: #ffffff;
+  color: #334155;
+  border: 1px solid #cbd5e1;
   padding: 0.45rem 0.9rem;
   border-radius: var(--radius-sm);
   cursor: pointer;
   font-family: inherit;
+  font-weight: 500;
+  transition: all 0.15s ease;
 }
 
 .btn-secondary:hover {
-  background: #475569;
+  background: #f1f5f9;
+  color: #0f172a;
+  border-color: #94a3b8;
 }
 
 .btn-danger {
-  background: #881337;
-  color: #fecdd3;
-  border: 1px solid #9f1239;
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
   padding: 0.4rem 0.8rem;
   border-radius: var(--radius-sm);
   cursor: pointer;
+  font-weight: 500;
+  transition: all 0.15s ease;
 }
 
 .btn-danger:hover {
-  background: #9f1239;
+  background: #fecaca;
+  color: #7f1d1d;
 }
 
 .input-field, .select-field {
   width: 100%;
-  background: #0f172a;
-  border: 1px solid var(--border-color);
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
   padding: 0.6rem 0.85rem;
   border-radius: var(--radius-sm);
   color: var(--text-main);
   font-family: inherit;
   outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .input-field:focus, .select-field:focus {
   border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
 }
 
 input[type="date"] {
-  color-scheme: dark;
+  color-scheme: light;
   position: relative;
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator {
   cursor: pointer;
-  filter: invert(0.8) sepia(1) saturate(5) hue-rotate(180deg);
-  opacity: 0.9;
+  opacity: 0.7;
   padding: 4px;
   border-radius: 4px;
   transition: all 0.2s ease;
@@ -207,7 +217,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 input[type="date"]::-webkit-calendar-picker-indicator:hover {
   opacity: 1;
-  background: rgba(56, 189, 248, 0.2);
+  background: rgba(2, 132, 199, 0.1);
 }
 
 .status-chip {
@@ -219,21 +229,21 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 }
 
 .status-chip.concluido {
-  background: #064e3b;
-  color: #a7f3d0;
-  border: 1px solid #047857;
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #86efac;
 }
 
 .status-chip.em_progresso {
-  background: #78350f;
-  color: #fef3c7;
-  border: 1px solid #b45309;
+  background: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fde047;
 }
 
 .status-chip.pendente {
-  background: #1e3a8a;
-  color: #bfdbfe;
-  border: 1px solid #1d4ed8;
+  background: #dbeafe;
+  color: #1e40af;
+  border: 1px solid #93c5fd;
 }
 
 @media (max-width: 768px) {

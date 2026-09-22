@@ -38,14 +38,14 @@ export const SettingsTab = () => {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
         <div>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: '700', color: 'white' }}>Configurações & Controlo de Acesso</h1>
+          <h1 style={{ fontSize: '1.75rem', fontWeight: '700', color: 'var(--text-main)' }}>Configurações & Controlo de Acesso</h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
             Atualização de perfil, notificações por email e administração de utilizadores (RBAC)
           </p>
         </div>
 
         {/* Abas Secundárias */}
-        <div style={{ display: 'flex', gap: '0.5rem', background: '#1e293b', padding: '0.25rem', borderRadius: 'var(--radius-sm)' }}>
+        <div style={{ display: 'flex', gap: '0.5rem', background: '#e2e8f0', padding: '0.25rem', borderRadius: 'var(--radius-sm)' }}>
           <button
             onClick={() => setSubTab('profile')}
             className={subTab === 'profile' ? 'btn-primary' : 'btn-secondary'}
@@ -92,7 +92,7 @@ export const SettingsTab = () => {
               <div style={{
                 background: msg.type === 'success' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(244, 63, 94, 0.15)',
                 border: `1px solid ${msg.type === 'success' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(244, 63, 94, 0.3)'}`,
-                color: msg.type === 'success' ? '#a7f3d0' : '#fda4af',
+                color: msg.type === 'success' ? '#047857' : '#e11d48',
                 padding: '0.75rem 1rem',
                 borderRadius: 'var(--radius-sm)',
                 marginBottom: '1rem',
@@ -125,7 +125,7 @@ export const SettingsTab = () => {
                   value={user?.email || ''}
                   className="input-field"
                   disabled
-                  style={{ opacity: 0.7, cursor: 'not-allowed' }}
+                  style={{ opacity: 0.7, cursor: 'not-allowed', background: '#f1f5f9' }}
                 />
               </div>
 
@@ -160,7 +160,7 @@ export const SettingsTab = () => {
                     }}
                     title={showPassword ? 'Ocultar palavra-passe' : 'Mostrar palavra-passe'}
                   >
-                    {showPassword ? <EyeOff size={18} color="#38bdf8" /> : <Eye size={18} />}
+                    {showPassword ? <EyeOff size={18} color="#0284c7" /> : <Eye size={18} />}
                   </button>
                 </div>
               </div>
@@ -179,7 +179,7 @@ export const SettingsTab = () => {
 
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
               <thead>
-                <tr style={{ background: '#0f172a', color: 'var(--text-muted)' }}>
+                <tr style={{ background: '#f8fafc', color: '#475569', borderBottom: '2px solid var(--border-color)' }}>
                   <th style={{ padding: '0.75rem' }}>Nível / Função</th>
                   <th style={{ padding: '0.75rem' }}>Visualizar Dados</th>
                   <th style={{ padding: '0.75rem' }}>Criar / Editar</th>

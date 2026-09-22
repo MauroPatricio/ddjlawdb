@@ -14,7 +14,7 @@ function MainApp() {
 
   if (loading) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0b0f19', color: '#38bdf8' }}>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f1f5f9', color: '#0284c7', fontWeight: '600' }}>
         A carregar sistema SIGINFO...
       </div>
     );

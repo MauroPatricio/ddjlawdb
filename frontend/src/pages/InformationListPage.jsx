@@ -111,7 +111,7 @@ export const InformationListPage = () => {
       {/* Título da Página */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
         <div>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: '700', color: 'white' }}>Nossas Informações</h1>
+          <h1 style={{ fontSize: '1.75rem', fontWeight: '700', color: 'var(--text-main)' }}>Nossas Informações</h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
             Base de dados de marcas, patentes e ficheiros comerciais
           </p>
@@ -122,7 +122,7 @@ export const InformationListPage = () => {
             onClick={handleExportExcel}
             disabled={exporting}
             className="btn-secondary"
-            style={{ background: '#065f46', color: '#a7f3d0', border: '1px solid #047857' }}
+            style={{ background: '#ecfdf5', color: '#047857', border: '1px solid #a7f3d0' }}
           >
             <FileSpreadsheet size={16} /> {exporting ? 'A gerar Excel...' : 'Exportar para Excel (.xlsx)'}
           </button>
@@ -167,7 +167,7 @@ export const InformationListPage = () => {
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
             <thead>
-              <tr style={{ background: '#0f172a', borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)' }}>
+              <tr style={{ background: '#f8fafc', borderBottom: '2px solid var(--border-color)', color: '#475569' }}>
                 <th style={{ padding: '1rem' }}>Informação Ref.</th>
                 <th style={{ padding: '1rem' }}>Tipo de Ficheiro</th>
                 <th style={{ padding: '1rem' }}>Data</th>
@@ -195,12 +195,12 @@ export const InformationListPage = () => {
               ) : (
                 informations.map((info) => (
                   <tr key={info._id} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                    <td style={{ padding: '1rem', fontWeight: '500', color: '#e2e8f0' }}>{info.infoRef}</td>
+                    <td style={{ padding: '1rem', fontWeight: '500', color: 'var(--text-main)' }}>{info.infoRef}</td>
                     <td style={{ padding: '1rem', color: 'var(--text-muted)' }}>{info.fileType}</td>
                     <td style={{ padding: '1rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
                       {info.date ? new Date(info.date).toISOString().split('T')[0] : ''}
                     </td>
-                    <td style={{ padding: '1rem', fontWeight: '600', color: 'white' }}>
+                    <td style={{ padding: '1rem', fontWeight: '600', color: 'var(--text-main)' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                         {info.logoUrl ? (
                           <img
@@ -214,14 +214,14 @@ export const InformationListPage = () => {
                               width: '36px',
                               height: '36px',
                               borderRadius: '6px',
-                              background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
-                              border: '1px solid #334155',
+                              background: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)',
+                              border: '1px solid #cbd5e1',
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
                               fontSize: '0.9rem',
                               fontWeight: '700',
-                              color: '#38bdf8',
+                              color: '#0284c7',
                               textTransform: 'uppercase',
                               flexShrink: 0
                             }}
