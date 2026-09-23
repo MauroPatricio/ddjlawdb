@@ -3,7 +3,7 @@ import ExcelJS from 'exceljs';
 import path from 'path';
 import fs from 'fs';
 
-// Seed automático com os dados idênticos aos das fotos enviadas
+// Seed automático e migração de registos legados
 export const seedInitialInformations = async () => {
   try {
     const count = await Information.countDocuments();
@@ -133,8 +133,45 @@ export const seedInitialInformations = async () => {
       ]);
       console.log('✅ Dados de demonstração do SIGINFO criados com sucesso!');
     }
+
+    // Migração permanente para garantir diuDate e renewalDate em TODOS os documentos no MongoDB
+    const legacyRecords = await Information.find({
+      $or: [
+        { diuDate: { $exists: false } },
+        { diuDate: null },
+        { renewalDate: { $exists: false } },
+        { renewalDate: null },
+      ],
+    });
+
+    if (legacyRecords.length > 0) {
+      console.log(`🔄 A migrar ${legacyRecords.length} registos sem Data DIU ou Renovação no MongoDB...`);
+      for (const record of legacyRecords) {
+        const baseDate = record.publicationDate || record.date || new Date();
+        const pub = new Date(baseDate);
+
+        const ren = record.renewalDate || record.expirationDate ? new Date(record.renewalDate || record.expirationDate) : new Date(pub);
+        if (!record.renewalDate && !record.expirationDate) {
+          ren.setFullYear(ren.getFullYear() + 10);
+        }
+
+        const diu = record.diuDate ? new Date(record.diuDate) : new Date(pub);
+        if (!record.diuDate) {
+          diu.setFullYear(diu.getFullYear() + 5);
+        }
+
+        await Information.findByIdAndUpdate(record._id, {
+          publicationDate: pub,
+          date: pub,
+          renewalDate: ren,
+          expirationDate: ren,
+          diuDate: diu,
+        });
+      }
+      console.log('✅ Migração de datas no MongoDB concluída com sucesso!');
+    }
   } catch (err) {
-    console.error('Erro ao popular informações:', err.message);
+    console.error('Erro ao popular ou migrar informações:', err.message);
   }
 };
 
@@ -162,26 +199,71 @@ export const getInformations = async (req, res, next) => {
       .skip((page - 1) * limit)
       .limit(limit);
 
+    // Mapeamento dinâmico para garantir que diuDate e renewalDate nunca sejam nulos no objeto retornado
+    const sanitizedInformations = informations.map((info) => {
+      const doc = info.toObject ? info.toObject() : { ...info };
+      const baseDate = doc.publicationDate || doc.date || new Date();
+
+      if (!doc.publicationDate) {
+        doc.publicationDate = baseDate;
+      }
+      if (!doc.renewalDate) {
+        const ren = new Date(baseDate);
+        ren.setFullYear(ren.getFullYear() + 10);
+        doc.renewalDate = ren;
+        doc.expirationDate = ren;
+      }
+      if (!doc.diuDate) {
+        const diu = new Date(baseDate);
+        diu.setFullYear(diu.getFullYear() + 5);
+        doc.diuDate = diu;
+      }
+      return doc;
+    });
+
     res.status(200).json({
       success: true,
-      count: informations.length,
+      count: sanitizedInformations.length,
       total,
       page,
       pages: Math.ceil(total / limit) || 1,
-      data: informations,
+      data: sanitizedInformations,
     });
   } catch (error) {
     next(error);
   }
 };
 
-// Obter detalhe de uma Informação (Ficha Técnica réplica Foto 3)
+// Obter detalhe de uma Informação (Ficha Técnica)
 export const getInformationById = async (req, res, next) => {
   try {
     const information = await Information.findById(req.params.id);
     if (!information) {
       return res.status(404).json({ success: false, message: 'Informação não encontrada' });
     }
+
+    let changed = false;
+    const baseDate = information.publicationDate || information.date || new Date();
+
+    if (!information.renewalDate) {
+      const ren = new Date(baseDate);
+      ren.setFullYear(ren.getFullYear() + 10);
+      information.renewalDate = ren;
+      information.expirationDate = ren;
+      changed = true;
+    }
+
+    if (!information.diuDate) {
+      const diu = new Date(baseDate);
+      diu.setFullYear(diu.getFullYear() + 5);
+      information.diuDate = diu;
+      changed = true;
+    }
+
+    if (changed) {
+      await information.save();
+    }
+
     res.status(200).json({ success: true, data: information });
   } catch (error) {
     next(error);
@@ -191,7 +273,22 @@ export const getInformationById = async (req, res, next) => {
 // Criar nova informação + Upload de PDF e Logotipo
 export const createInformation = async (req, res, next) => {
   try {
-    const { infoRef, fileType, date, brand, clazz, owner, status, certified, address, observation } = req.body;
+    const {
+      infoRef,
+      fileType,
+      publicationDate,
+      date,
+      renewalDate,
+      expirationDate,
+      diuDate,
+      brand,
+      clazz,
+      owner,
+      status,
+      certified,
+      address,
+      observation,
+    } = req.body;
 
     let documentUrl = '';
     let documentOriginalName = '';
@@ -208,15 +305,32 @@ export const createInformation = async (req, res, next) => {
         logoUrl = `/uploads/logos/${logoFile.filename}`;
       }
     } else if (req.file) {
-      // Compatibilidade com single file upload
       documentUrl = `/uploads/documents/${req.file.filename}`;
       documentOriginalName = req.file.originalname;
+    }
+
+    const pubDate = publicationDate || date ? new Date(publicationDate || date) : new Date();
+
+    let renDate = renewalDate || expirationDate ? new Date(renewalDate || expirationDate) : undefined;
+    if (!renDate || isNaN(renDate.getTime())) {
+      renDate = new Date(pubDate);
+      renDate.setFullYear(renDate.getFullYear() + 10);
+    }
+
+    let diuDateObj = diuDate ? new Date(diuDate) : undefined;
+    if (!diuDateObj || isNaN(diuDateObj.getTime())) {
+      diuDateObj = new Date(pubDate);
+      diuDateObj.setFullYear(diuDateObj.getFullYear() + 5);
     }
 
     const information = await Information.create({
       infoRef,
       fileType,
-      date: date ? new Date(date) : new Date(),
+      publicationDate: pubDate,
+      date: pubDate,
+      renewalDate: renDate,
+      expirationDate: renDate,
+      diuDate: diuDateObj,
       brand,
       clazz: Number(clazz),
       owner,
@@ -246,7 +360,29 @@ export const updateInformation = async (req, res, next) => {
 
     const updateFields = { ...req.body };
     if (updateFields.clazz) updateFields.clazz = Number(updateFields.clazz);
-    if (updateFields.date) updateFields.date = new Date(updateFields.date);
+
+    if (updateFields.publicationDate && updateFields.publicationDate !== '') {
+      updateFields.publicationDate = new Date(updateFields.publicationDate);
+      updateFields.date = updateFields.publicationDate;
+    } else if (updateFields.date && updateFields.date !== '') {
+      updateFields.publicationDate = new Date(updateFields.date);
+      updateFields.date = updateFields.publicationDate;
+    }
+
+    if (updateFields.renewalDate && updateFields.renewalDate !== '') {
+      updateFields.renewalDate = new Date(updateFields.renewalDate);
+      updateFields.expirationDate = updateFields.renewalDate;
+    } else if (updateFields.expirationDate && updateFields.expirationDate !== '') {
+      updateFields.renewalDate = new Date(updateFields.expirationDate);
+      updateFields.expirationDate = updateFields.renewalDate;
+    }
+
+    if (updateFields.diuDate !== undefined && updateFields.diuDate !== '') {
+      const parsedDiu = new Date(updateFields.diuDate);
+      if (!isNaN(parsedDiu.getTime())) {
+        updateFields.diuDate = parsedDiu;
+      }
+    }
 
     if (req.files) {
       if (req.files.document && req.files.document[0]) {
@@ -276,10 +412,12 @@ export const updateInformation = async (req, res, next) => {
       updateFields.documentOriginalName = req.file.originalname;
     }
 
-    information = await Information.findByIdAndUpdate(req.params.id, updateFields, {
-      new: true,
-      runValidators: true,
-    });
+    // Usar $set explicitamente para garantir que TODOS os campos (incluindo diuDate) são gravados no MongoDB
+    information = await Information.findByIdAndUpdate(
+      req.params.id,
+      { $set: updateFields },
+      { new: true, runValidators: true }
+    );
 
     res.status(200).json({ success: true, data: information });
   } catch (error) {
@@ -327,7 +465,9 @@ export const exportExcel = async (req, res, next) => {
     worksheet.columns = [
       { header: 'Informação Ref.', key: 'infoRef', width: 18 },
       { header: 'Tipo de Ficheiro', key: 'fileType', width: 20 },
-      { header: 'Data', key: 'date', width: 15 },
+      { header: 'Data Publicação', key: 'publicationDate', width: 16 },
+      { header: 'Data Renovação', key: 'renewalDate', width: 16 },
+      { header: 'Data para DIU', key: 'diuDate', width: 16 },
       { header: 'Marca', key: 'brand', width: 30 },
       { header: 'Classe', key: 'clazz', width: 10 },
       { header: 'Proprietário', key: 'owner', width: 40 },
@@ -351,10 +491,26 @@ export const exportExcel = async (req, res, next) => {
 
     // Adicionar Dados
     informations.forEach((info) => {
+      const pubDateStr = info.publicationDate
+        ? new Date(info.publicationDate).toISOString().split('T')[0]
+        : info.date
+        ? new Date(info.date).toISOString().split('T')[0]
+        : '';
+
+      const renDateStr = info.renewalDate
+        ? new Date(info.renewalDate).toISOString().split('T')[0]
+        : info.expirationDate
+        ? new Date(info.expirationDate).toISOString().split('T')[0]
+        : '';
+
+      const diuDateStr = info.diuDate ? new Date(info.diuDate).toISOString().split('T')[0] : '';
+
       worksheet.addRow({
         infoRef: info.infoRef,
         fileType: info.fileType,
-        date: info.date ? new Date(info.date).toISOString().split('T')[0] : '',
+        publicationDate: pubDateStr,
+        renewalDate: renDateStr,
+        diuDate: diuDateStr,
         brand: info.brand,
         clazz: info.clazz,
         owner: info.owner,

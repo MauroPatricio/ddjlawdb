@@ -13,9 +13,22 @@ const informationSchema = new mongoose.Schema(
       default: 'Marca Comercial',
       trim: true,
     },
+    publicationDate: {
+      type: Date,
+      default: Date.now,
+    },
     date: {
       type: Date,
       default: Date.now,
+    },
+    renewalDate: {
+      type: Date,
+    },
+    expirationDate: {
+      type: Date,
+    },
+    diuDate: {
+      type: Date,
     },
     brand: {
       type: String,
@@ -63,9 +76,6 @@ const informationSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
-    expirationDate: {
-      type: Date,
-    },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
@@ -77,13 +87,37 @@ const informationSchema = new mongoose.Schema(
 );
 
 informationSchema.pre('save', function (next) {
-  if (!this.expirationDate) {
-    const baseDate = this.date ? new Date(this.date) : new Date();
-    const exp = new Date(baseDate);
-    exp.setFullYear(exp.getFullYear() + 10);
-    this.expirationDate = exp;
+  const baseDate = this.publicationDate || this.date ? new Date(this.publicationDate || this.date) : new Date();
+
+  if (!this.publicationDate) {
+    this.publicationDate = baseDate;
   }
+  if (!this.date) {
+    this.date = baseDate;
+  }
+
+  // Data de Renovação (Validade Padrão: 10 Anos)
+  if (!this.renewalDate) {
+    if (this.expirationDate) {
+      this.renewalDate = new Date(this.expirationDate);
+    } else {
+      const exp = new Date(baseDate);
+      exp.setFullYear(exp.getFullYear() + 10);
+      this.renewalDate = exp;
+    }
+  }
+  if (!this.expirationDate && this.renewalDate) {
+    this.expirationDate = new Date(this.renewalDate);
+  }
+
+  // Data para DIU - Declaração de Intenção de Uso (Padrão: 5 Anos)
+  if (!this.diuDate) {
+    const diu = new Date(baseDate);
+    diu.setFullYear(diu.getFullYear() + 5);
+    this.diuDate = diu;
+  }
+
   next();
 });
 
-export const Information = mongoose.model('Information', informationSchema);
+export const Information = mongoose.model('Information', informationSchema, 'information');

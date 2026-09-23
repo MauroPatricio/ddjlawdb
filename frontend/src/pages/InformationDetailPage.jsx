@@ -46,11 +46,43 @@ export const InformationDetailPage = ({ infoId, onBack, onDelete }) => {
     );
   }
 
-  const formattedDate = data.date ? new Date(data.date).toLocaleDateString('pt-PT') : 'N/A';
+  const pubDateObj = data.publicationDate
+    ? new Date(data.publicationDate)
+    : data.date
+    ? new Date(data.date)
+    : null;
+
+  const pubDateFormatted = pubDateObj ? pubDateObj.toLocaleDateString('pt-PT') : 'N/A';
+
+  const renDateObj = data.renewalDate
+    ? new Date(data.renewalDate)
+    : data.expirationDate
+    ? new Date(data.expirationDate)
+    : pubDateObj
+    ? (() => {
+        const d = new Date(pubDateObj);
+        d.setFullYear(d.getFullYear() + 10);
+        return d;
+      })()
+    : null;
+
+  const renDateFormatted = renDateObj ? renDateObj.toLocaleDateString('pt-PT') : 'N/A';
+
+  const diuDateObj = data.diuDate
+    ? new Date(data.diuDate)
+    : pubDateObj
+    ? (() => {
+        const d = new Date(pubDateObj);
+        d.setFullYear(d.getFullYear() + 5);
+        return d;
+      })()
+    : null;
+
+  const diuDateFormatted = diuDateObj ? diuDateObj.toLocaleDateString('pt-PT') : 'N/A';
 
   return (
-    <div style={{ background: '#f8fafc', color: '#0f172a', borderRadius: 'var(--radius-lg)', padding: '2.5rem', boxShadow: '0 10px 30px rgba(0,0,0,0.2)' }}>
-      {/* Título Principal Réplica da Foto 3 */}
+    <div style={{ background: '#f8fafc', color: '#0f172a', borderRadius: 'var(--radius-lg)', padding: '2.5rem', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}>
+      {/* Título Principal */}
       <div style={{ paddingBottom: '1.25rem', borderBottom: '2px solid #e2e8f0', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h1 style={{ fontSize: '1.75rem', fontWeight: '400', color: '#1e293b' }}>Visualizando Informação</h1>
         <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -75,8 +107,8 @@ export const InformationDetailPage = ({ infoId, onBack, onDelete }) => {
         </div>
       </div>
 
-      {/* Grid de Campos Réplica Exata da Foto 3 */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '2rem 1.5rem', marginBottom: '2.5rem' }}>
+      {/* Grid de Campos Principal */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '2rem 1.5rem', marginBottom: '2rem' }}>
         <div>
           <div style={{ fontWeight: '700', fontSize: '0.9rem', color: '#334155' }}>Informação Ref.:</div>
           <div style={{ fontSize: '1rem', color: '#475569', marginTop: '0.25rem' }}>{data.infoRef}</div>
@@ -88,8 +120,8 @@ export const InformationDetailPage = ({ infoId, onBack, onDelete }) => {
         </div>
 
         <div>
-          <div style={{ fontWeight: '700', fontSize: '0.9rem', color: '#334155' }}>Data:</div>
-          <div style={{ fontSize: '1rem', color: '#475569', marginTop: '0.25rem' }}>{formattedDate}</div>
+          <div style={{ fontWeight: '700', fontSize: '0.9rem', color: '#334155' }}>Marca:</div>
+          <div style={{ fontSize: '1.05rem', fontWeight: '600', color: '#0f172a', marginTop: '0.25rem' }}>{data.brand}</div>
         </div>
 
         <div>
@@ -106,21 +138,27 @@ export const InformationDetailPage = ({ infoId, onBack, onDelete }) => {
           <div style={{ fontWeight: '700', fontSize: '0.9rem', color: '#334155' }}>Certificado:</div>
           <div style={{ fontSize: '1rem', color: '#475569', marginTop: '0.25rem' }}>{data.certified}</div>
         </div>
+      </div>
 
-        <div>
-          <div style={{ fontWeight: '700', fontSize: '0.9rem', color: '#334155' }}>Marca:</div>
-          <div style={{ fontSize: '1.05rem', fontWeight: '600', color: '#0f172a', marginTop: '0.25rem' }}>{data.brand}</div>
+      {/* Bloco Destaque com as 3 Datas Importantes */}
+      <div style={{ background: '#ffffff', padding: '1.25rem', borderRadius: 'var(--radius-md)', border: '1px solid #cbd5e1', marginBottom: '2rem' }}>
+        <div style={{ fontWeight: '700', fontSize: '0.95rem', color: '#0284c7', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          📅 Datas Legais & Prazos do Registo
         </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1.5rem' }}>
+          <div>
+            <div style={{ fontWeight: '700', fontSize: '0.85rem', color: '#475569' }}>Data de Publicação:</div>
+            <div style={{ fontSize: '1.1rem', fontWeight: '600', color: '#0f172a', marginTop: '0.25rem' }}>{pubDateFormatted}</div>
+          </div>
 
-        <div>
-          <div style={{ fontWeight: '700', fontSize: '0.9rem', color: '#334155' }}>Proprietário:</div>
-          <div style={{ fontSize: '1rem', color: '#475569', marginTop: '0.25rem' }}>{data.owner}</div>
-        </div>
+          <div>
+            <div style={{ fontWeight: '700', fontSize: '0.85rem', color: '#d97706' }}>Data de Renovação:</div>
+            <div style={{ fontSize: '1.1rem', fontWeight: '600', color: '#b45309', marginTop: '0.25rem' }}>{renDateFormatted}</div>
+          </div>
 
-        <div>
-          <div style={{ fontWeight: '700', fontSize: '0.9rem', color: '#334155' }}>Endereço:</div>
-          <div style={{ fontSize: '0.95rem', color: '#475569', marginTop: '0.25rem', lineHeight: '1.4' }}>
-            {data.address || 'Não especificado'}
+          <div>
+            <div style={{ fontWeight: '700', fontSize: '0.85rem', color: '#2563eb' }}>Data para DIU:</div>
+            <div style={{ fontSize: '1.1rem', fontWeight: '600', color: '#1d4ed8', marginTop: '0.25rem' }}>{diuDateFormatted}</div>
           </div>
         </div>
       </div>

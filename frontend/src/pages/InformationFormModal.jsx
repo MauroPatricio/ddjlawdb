@@ -1,12 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { X, Upload, Save, FileCheck, Image as ImageIcon, Calendar } from 'lucide-react';
 
+const formatYMD = (val) => {
+  if (!val) return '';
+  if (typeof val === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(val)) {
+    return val;
+  }
+  const d = new Date(val);
+  if (isNaN(d.getTime())) return '';
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 export const InformationFormModal = ({ isOpen, onClose, onSave, initialData }) => {
   const [formData, setFormData] = useState({
     infoRef: '',
     fileType: 'Marca Comercial',
-    date: new Date().toISOString().split('T')[0],
-    expirationDate: '',
+    publicationDate: formatYMD(new Date()),
+    renewalDate: '',
+    diuDate: '',
     brand: '',
     clazz: '30',
     owner: '',
@@ -23,11 +37,28 @@ export const InformationFormModal = ({ isOpen, onClose, onSave, initialData }) =
 
   useEffect(() => {
     if (initialData) {
+      const pubStr = formatYMD(initialData.publicationDate || initialData.date) || formatYMD(new Date());
+
+      let renStr = formatYMD(initialData.renewalDate || initialData.expirationDate);
+      if (!renStr) {
+        const renObj = new Date(pubStr);
+        renObj.setFullYear(renObj.getFullYear() + 10);
+        renStr = formatYMD(renObj);
+      }
+
+      let diuStr = formatYMD(initialData.diuDate);
+      if (!diuStr) {
+        const diuObj = new Date(pubStr);
+        diuObj.setFullYear(diuObj.getFullYear() + 5);
+        diuStr = formatYMD(diuObj);
+      }
+
       setFormData({
         infoRef: initialData.infoRef || '',
         fileType: initialData.fileType || 'Marca Comercial',
-        date: initialData.date ? new Date(initialData.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-        expirationDate: initialData.expirationDate ? new Date(initialData.expirationDate).toISOString().split('T')[0] : '',
+        publicationDate: pubStr,
+        renewalDate: renStr,
+        diuDate: diuStr,
         brand: initialData.brand || '',
         clazz: initialData.clazz || '30',
         owner: initialData.owner || '',
@@ -40,15 +71,18 @@ export const InformationFormModal = ({ isOpen, onClose, onSave, initialData }) =
       setSelectedLogo(null);
       setLogoPreview(initialData.logoUrl ? `http://localhost:5000${initialData.logoUrl}` : '');
     } else {
-      const defaultDate = new Date();
-      const defaultExp = new Date();
-      defaultExp.setFullYear(defaultExp.getFullYear() + 10);
+      const defaultPub = new Date();
+      const defaultRen = new Date(defaultPub);
+      defaultRen.setFullYear(defaultRen.getFullYear() + 10);
+      const defaultDiu = new Date(defaultPub);
+      defaultDiu.setFullYear(defaultDiu.getFullYear() + 5);
 
       setFormData({
         infoRef: '',
         fileType: 'Marca Comercial',
-        date: defaultDate.toISOString().split('T')[0],
-        expirationDate: defaultExp.toISOString().split('T')[0],
+        publicationDate: formatYMD(defaultPub),
+        renewalDate: formatYMD(defaultRen),
+        diuDate: formatYMD(defaultDiu),
         brand: '',
         clazz: '30',
         owner: '',
@@ -93,6 +127,10 @@ export const InformationFormModal = ({ isOpen, onClose, onSave, initialData }) =
       payload.append(key, formData[key]);
     });
 
+    // Alias retrocompatíveis para o backend
+    payload.append('date', formData.publicationDate);
+    payload.append('expirationDate', formData.renewalDate);
+
     if (selectedFile) {
       payload.append('document', selectedFile);
     }
@@ -125,7 +163,7 @@ export const InformationFormModal = ({ isOpen, onClose, onSave, initialData }) =
       zIndex: 1000,
       padding: '1rem'
     }}>
-      <div className="card" style={{ maxWidth: '720px', width: '100%', maxHeight: '90vh', overflowY: 'auto', padding: '2rem' }}>
+      <div className="card" style={{ maxWidth: '780px', width: '100%', maxHeight: '90vh', overflowY: 'auto', padding: '2rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px solid var(--border-color)' }}>
           <h2 style={{ fontSize: '1.25rem', fontWeight: '700' }}>
             {initialData ? 'Editar Registo de Informação' : 'Nova Informação (SIGINFO)'}
@@ -136,7 +174,7 @@ export const InformationFormModal = ({ isOpen, onClose, onSave, initialData }) =
         </div>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-          {/* Secção de Upload de Ficheiro Logotipo (Imagem) - Primeiro Campo */}
+          {/* Secção de Upload de Ficheiro Logotipo (Imagem) */}
           <div style={{ background: '#f8fafc', padding: '1.25rem', borderRadius: 'var(--radius-md)', border: '1px dashed #0284c7' }}>
             <label style={{ fontSize: '0.85rem', color: '#0284c7', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '0.5rem' }}>
               <ImageIcon size={16} /> Carregar Logotipo da Marca (Imagem PNG, JPG, WEBP)
@@ -159,7 +197,7 @@ export const InformationFormModal = ({ isOpen, onClose, onSave, initialData }) =
             )}
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
             <div>
               <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.4rem' }}>
                 Informação Ref. *
@@ -186,9 +224,7 @@ export const InformationFormModal = ({ isOpen, onClose, onSave, initialData }) =
                 <option value="Outro">Outro</option>
               </select>
             </div>
-          </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr', gap: '1rem' }}>
             <div>
               <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.4rem' }}>
                 Marca / Nome *
@@ -203,46 +239,58 @@ export const InformationFormModal = ({ isOpen, onClose, onSave, initialData }) =
                 required
               />
             </div>
+          </div>
 
-            <div>
-              <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.4rem' }}>
-                Classe *
-              </label>
-              <input
-                type="number"
-                name="clazz"
-                className="input-field"
-                placeholder="ex: 30"
-                value={formData.clazz}
-                onChange={handleChange}
-                required
-              />
-            </div>
+          {/* As 3 Datas Obrigatórias do Sistema */}
+          <div style={{ background: '#f8fafc', padding: '1.1rem', borderRadius: 'var(--radius-md)', border: '1px solid #e2e8f0' }}>
+            <span style={{ fontSize: '0.85rem', fontWeight: '700', color: '#0284c7', display: 'block', marginBottom: '0.75rem' }}>
+              📅 Controlo de Datas de Registo & Prazos Legais (DIU / Renovação)
+            </span>
 
-            <div>
-              <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '0.4rem' }}>
-                <Calendar size={14} color="#0284c7" /> Data Registo
-              </label>
-              <input
-                type="date"
-                name="date"
-                className="input-field"
-                value={formData.date}
-                onChange={handleChange}
-              />
-            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
+              <div>
+                <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '0.4rem', fontWeight: '600' }}>
+                  <Calendar size={14} color="#0284c7" /> Data de Publicação *
+                </label>
+                <input
+                  type="date"
+                  name="publicationDate"
+                  className="input-field"
+                  value={formData.publicationDate}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
-            <div>
-              <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '0.4rem' }}>
-                <Calendar size={14} color="#f59e0b" /> Data Expiração
-              </label>
-              <input
-                type="date"
-                name="expirationDate"
-                className="input-field"
-                value={formData.expirationDate}
-                onChange={handleChange}
-              />
+              <div>
+                <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '0.4rem', fontWeight: '600' }}>
+                  <Calendar size={14} color="#d97706" /> Data de Renovação *
+                </label>
+                <input
+                  type="date"
+                  name="renewalDate"
+                  className="input-field"
+                  value={formData.renewalDate}
+                  onChange={handleChange}
+                  required
+                />
+                <span style={{ fontSize: '0.72rem', color: '#64748b', marginTop: '2px', display: 'block' }}>Padrão: +10 anos da publicação</span>
+              </div>
+
+              <div>
+                <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '0.4rem', fontWeight: '600' }}>
+                  <Calendar size={14} color="#2563eb" /> Data para DIU *
+                </label>
+                <input
+                  type="date"
+                  name="diuDate"
+                  className="input-field"
+                  value={formData.diuDate}
+                  onChange={handleChange}
+                  required
+                />
+                <span style={{ fontSize: '0.72rem', color: '#64748b', marginTop: '2px', display: 'block' }}>Padrão: +5 anos da publicação</span>
+              </div>
             </div>
           </div>
 

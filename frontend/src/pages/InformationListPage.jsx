@@ -165,131 +165,163 @@ export const InformationListPage = () => {
       {/* Tabela Principal */}
       <div className="card" style={{ padding: '0', overflow: 'hidden' }}>
         <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
             <thead>
               <tr style={{ background: '#f8fafc', borderBottom: '2px solid var(--border-color)', color: '#475569' }}>
-                <th style={{ padding: '1rem' }}>Informação Ref.</th>
-                <th style={{ padding: '1rem' }}>Tipo de Ficheiro</th>
-                <th style={{ padding: '1rem' }}>Data</th>
-                <th style={{ padding: '1rem' }}>Marca</th>
-                <th style={{ padding: '1rem' }}>Classe</th>
-                <th style={{ padding: '1rem' }}>Proprietário</th>
-                <th style={{ padding: '1rem' }}>Estado</th>
-                <th style={{ padding: '1rem' }}>Certificado</th>
-                <th style={{ padding: '1rem', textAlign: 'center' }}>Action</th>
+                <th style={{ padding: '0.75rem 0.6rem' }}>Informação Ref.</th>
+                <th style={{ padding: '0.75rem 0.6rem' }}>Tipo Ficheiro</th>
+                <th style={{ padding: '0.75rem 0.6rem' }}>Data Publicação</th>
+                <th style={{ padding: '0.75rem 0.6rem' }}>Data Renovação</th>
+                <th style={{ padding: '0.75rem 0.6rem' }}>Data DIU</th>
+                <th style={{ padding: '0.75rem 0.6rem' }}>Marca</th>
+                <th style={{ padding: '0.75rem 0.6rem' }}>Classe</th>
+                <th style={{ padding: '0.75rem 0.6rem' }}>Proprietário</th>
+                <th style={{ padding: '0.75rem 0.6rem' }}>Estado</th>
+                <th style={{ padding: '0.75rem 0.6rem' }}>Certificado</th>
+                <th style={{ padding: '0.75rem 0.6rem', textAlign: 'center', position: 'sticky', right: 0, background: '#f8fafc', zIndex: 10, boxShadow: '-4px 0 8px -2px rgba(0,0,0,0.06)' }}>Action</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={9} style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                  <td colSpan={11} style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
                     A carregar informações...
                   </td>
                 </tr>
               ) : informations.length === 0 ? (
                 <tr>
-                  <td colSpan={9} style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                  <td colSpan={11} style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
                     Nenhum registo encontrado.
                   </td>
                 </tr>
               ) : (
-                informations.map((info) => (
-                  <tr key={info._id} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                    <td style={{ padding: '1rem', fontWeight: '500', color: 'var(--text-main)' }}>{info.infoRef}</td>
-                    <td style={{ padding: '1rem', color: 'var(--text-muted)' }}>{info.fileType}</td>
-                    <td style={{ padding: '1rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
-                      {info.date ? new Date(info.date).toISOString().split('T')[0] : ''}
-                    </td>
-                    <td style={{ padding: '1rem', fontWeight: '600', color: 'var(--text-main)' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                        {info.logoUrl ? (
-                          <img
-                            src={`http://localhost:5000${info.logoUrl}`}
-                            alt={info.brand}
-                            style={{ width: '36px', height: '36px', objectFit: 'contain', borderRadius: '6px', background: '#ffffff', padding: '2px', border: '1px solid var(--border-color)' }}
-                          />
-                        ) : (
-                          <div
-                            style={{
-                              width: '36px',
-                              height: '36px',
-                              borderRadius: '6px',
-                              background: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)',
-                              border: '1px solid #cbd5e1',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              fontSize: '0.9rem',
-                              fontWeight: '700',
-                              color: '#0284c7',
-                              textTransform: 'uppercase',
-                              flexShrink: 0
-                            }}
-                            title="Sem logótipo carregado (Clique em editar para adicionar)"
-                          >
-                            {info.brand ? info.brand.charAt(0) : 'M'}
-                          </div>
-                        )}
-                        <span>{info.brand}</span>
-                      </div>
-                    </td>
-                    <td style={{ padding: '1rem', color: '#38bdf8', fontWeight: '600' }}>{info.clazz}</td>
-                    <td style={{ padding: '1rem', color: 'var(--text-muted)' }}>{info.owner}</td>
-                    <td style={{ padding: '1rem' }}>
-                      <span className={`status-chip ${info.status === 'Concedido' ? 'concluido' : info.status === 'Publicado' ? 'em_progresso' : 'pendente'}`}>
-                        {info.status}
-                      </span>
-                    </td>
-                    <td style={{ padding: '1rem', color: 'var(--text-muted)' }}>{info.certified}</td>
-                    <td style={{ padding: '1rem', textAlign: 'center' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}>
-                        <button
-                          onClick={() => setSelectedInfoId(info._id)}
-                          className="btn-secondary"
-                          style={{ padding: '0.35rem 0.5rem' }}
-                          title="Visualizar Informação"
-                        >
-                          <Eye size={15} />
-                        </button>
+                informations.map((info) => {
+                  const pubDateStr = info.publicationDate
+                    ? new Date(info.publicationDate).toISOString().split('T')[0]
+                    : info.date
+                    ? new Date(info.date).toISOString().split('T')[0]
+                    : '-';
 
-                        {info.documentUrl && (
-                          <a
-                            href={`http://localhost:5000${info.documentUrl}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="btn-secondary"
-                            style={{ padding: '0.35rem 0.5rem', color: '#38bdf8' }}
-                            title="Ver Documento PDF"
-                          >
-                            <FileText size={15} />
-                          </a>
-                        )}
+                  const renDateStr = info.renewalDate
+                    ? new Date(info.renewalDate).toISOString().split('T')[0]
+                    : info.expirationDate
+                    ? new Date(info.expirationDate).toISOString().split('T')[0]
+                    : pubDateStr !== '-'
+                    ? (() => {
+                        const d = new Date(pubDateStr);
+                        d.setFullYear(d.getFullYear() + 10);
+                        return d.toISOString().split('T')[0];
+                      })()
+                    : '-';
 
-                        {canEdit && (
+                  const diuDateStr = info.diuDate
+                    ? new Date(info.diuDate).toISOString().split('T')[0]
+                    : pubDateStr !== '-'
+                    ? (() => {
+                        const d = new Date(pubDateStr);
+                        d.setFullYear(d.getFullYear() + 5);
+                        return d.toISOString().split('T')[0];
+                      })()
+                    : '-';
+
+                  return (
+                    <tr key={info._id} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                      <td style={{ padding: '0.75rem 0.6rem', fontWeight: '600', color: 'var(--text-main)', whiteSpace: 'nowrap' }}>{info.infoRef}</td>
+                      <td style={{ padding: '0.75rem 0.6rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{info.fileType}</td>
+                      <td style={{ padding: '0.75rem 0.6rem', color: '#475569', whiteSpace: 'nowrap' }}>{pubDateStr}</td>
+                      <td style={{ padding: '0.75rem 0.6rem', color: '#d97706', fontWeight: '600', whiteSpace: 'nowrap' }}>{renDateStr}</td>
+                      <td style={{ padding: '0.75rem 0.6rem', color: '#2563eb', fontWeight: '600', whiteSpace: 'nowrap' }}>{diuDateStr}</td>
+                      <td style={{ padding: '0.75rem 0.6rem', fontWeight: '600', color: 'var(--text-main)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          {info.logoUrl ? (
+                            <img
+                              src={`http://localhost:5000${info.logoUrl}`}
+                              alt={info.brand}
+                              style={{ width: '32px', height: '32px', objectFit: 'contain', borderRadius: '6px', background: '#ffffff', padding: '2px', border: '1px solid var(--border-color)' }}
+                            />
+                          ) : (
+                            <div
+                              style={{
+                                width: '32px',
+                                height: '32px',
+                                borderRadius: '6px',
+                                background: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)',
+                                border: '1px solid #cbd5e1',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '0.85rem',
+                                fontWeight: '700',
+                                color: '#0284c7',
+                                textTransform: 'uppercase',
+                                flexShrink: 0
+                              }}
+                              title="Sem logótipo carregado (Clique em editar para adicionar)"
+                            >
+                              {info.brand ? info.brand.charAt(0) : 'M'}
+                            </div>
+                          )}
+                          <span style={{ whiteSpace: 'nowrap' }}>{info.brand}</span>
+                        </div>
+                      </td>
+                      <td style={{ padding: '0.75rem 0.6rem', color: '#0284c7', fontWeight: '600' }}>{info.clazz}</td>
+                      <td style={{ padding: '0.75rem 0.6rem', color: 'var(--text-muted)' }}>{info.owner}</td>
+                      <td style={{ padding: '0.75rem 0.6rem' }}>
+                        <span className={`status-chip ${info.status === 'Concedido' ? 'concluido' : info.status === 'Publicado' ? 'em_progresso' : 'pendente'}`}>
+                          {info.status}
+                        </span>
+                      </td>
+                      <td style={{ padding: '0.75rem 0.6rem', color: 'var(--text-muted)' }}>{info.certified}</td>
+                      <td style={{ padding: '0.75rem 0.6rem', textAlign: 'center', position: 'sticky', right: 0, background: '#ffffff', zIndex: 5, boxShadow: '-4px 0 8px -2px rgba(0,0,0,0.06)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem' }}>
                           <button
-                            onClick={() => { setEditingData(info); setIsFormOpen(true); }}
+                            onClick={() => setSelectedInfoId(info._id)}
                             className="btn-secondary"
                             style={{ padding: '0.35rem 0.5rem' }}
-                            title="Editar"
+                            title="Visualizar Informação"
                           >
-                            <Edit size={15} />
+                            <Eye size={15} />
                           </button>
-                        )}
 
-                        {canDelete && (
-                          <button
-                            onClick={() => handleDelete(info._id, info.brand)}
-                            className="btn-danger"
-                            style={{ padding: '0.35rem 0.5rem' }}
-                            title="Eliminar"
-                          >
-                            <Trash2 size={15} />
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                          {info.documentUrl && (
+                            <a
+                              href={`http://localhost:5000${info.documentUrl}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="btn-secondary"
+                              style={{ padding: '0.35rem 0.5rem', color: '#0284c7' }}
+                              title="Ver Documento PDF"
+                            >
+                              <FileText size={15} />
+                            </a>
+                          )}
+
+                          {canEdit && (
+                            <button
+                              onClick={() => { setEditingData(info); setIsFormOpen(true); }}
+                              className="btn-secondary"
+                              style={{ padding: '0.35rem 0.5rem' }}
+                              title="Editar"
+                            >
+                              <Edit size={15} />
+                            </button>
+                          )}
+
+                          {canDelete && (
+                            <button
+                              onClick={() => handleDelete(info._id, info.brand)}
+                              className="btn-danger"
+                              style={{ padding: '0.35rem 0.5rem' }}
+                              title="Eliminar"
+                            >
+                              <Trash2 size={15} />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>

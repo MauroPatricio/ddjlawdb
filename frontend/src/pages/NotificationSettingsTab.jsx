@@ -88,10 +88,10 @@ export const NotificationSettingsTab = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h3 style={{ fontSize: '1.2rem', fontWeight: '700', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Bell size={22} color="#0284c7" /> Configurações de Notificações de Expiração
+            <Bell size={22} color="#0284c7" /> Configurações de Notificações (Renovação & DIU)
           </h3>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '0.25rem' }}>
-            Defina o email de destino, a hora de envio, o período e a antecedência em dias para notificar registos a expirar.
+            Defina o email de destino, a hora de envio, a frequência e a antecedência em dias para notificar registos prestes a expirar a <strong>Data de Renovação</strong> ou a <strong>Data para DIU</strong>.
           </p>
         </div>
 
@@ -101,7 +101,7 @@ export const NotificationSettingsTab = () => {
           disabled={testing || !notificationEmail}
           className="btn-secondary"
           style={{ background: '#0284c7', color: '#ffffff', border: 'none' }}
-          title="Disparar um envio de teste para verificar a receção do email"
+          title="Disparar um envio de teste para verificar a receção do email de alerta de Renovação & DIU"
         >
           <Send size={16} /> {testing ? 'A Enviar Teste...' : 'Enviar Email de Teste'}
         </button>
@@ -132,7 +132,7 @@ export const NotificationSettingsTab = () => {
           {/* Email de Notificação */}
           <div style={{ gridColumn: 'span 2' }}>
             <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '0.4rem' }}>
-              <Mail size={15} color="#0284c7" /> Email de Destino para Notificações
+              <Mail size={15} color="#0284c7" /> Email de Destino para Notificações (Configurável)
             </label>
             <input
               type="email"
@@ -143,7 +143,7 @@ export const NotificationSettingsTab = () => {
               required
             />
             <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.3rem', display: 'block' }}>
-              Este email receberá relatórios periódicos de marcas e patentes prestes a expirar.
+              Este email receberá alertas automáticos de prazos legais prestes a vencer (Renovação e DIU).
             </span>
           </div>
 
@@ -169,16 +169,16 @@ export const NotificationSettingsTab = () => {
           {/* Período / Frequência */}
           <div>
             <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '0.4rem' }}>
-              <Calendar size={15} color="#10b981" /> Período / Frequência
+              <Calendar size={15} color="#10b981" /> Frequência de Verificação
             </label>
             <select
               value={period}
               onChange={(e) => setPeriod(e.target.value)}
               className="select-field"
             >
-              <option value="Diário">Diário (Todos os dias)</option>
-              <option value="Semanal">Semanal (Uma vez por semana)</option>
-              <option value="Mensal">Mensal (Uma vez por mês)</option>
+              <option value="Diário">Diário (Verificar Todos os Dias)</option>
+              <option value="Semanal">Semanal (Uma Vez por Semana)</option>
+              <option value="Mensal">Mensal (Uma Vez por Mês)</option>
             </select>
           </div>
 
@@ -197,7 +197,7 @@ export const NotificationSettingsTab = () => {
               required
             />
             <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.3rem', display: 'block' }}>
-              Ex: 30 dias notifica registos com expiração até um mês antes.
+              Ex: 30 dias envia aviso quando a data de Renovação ou DIU estiver a 30 dias de expirar.
             </span>
           </div>
         </div>
@@ -212,7 +212,7 @@ export const NotificationSettingsTab = () => {
             style={{ width: '18px', height: '18px', cursor: 'pointer' }}
           />
           <label htmlFor="notificationsEnabled" style={{ cursor: 'pointer', fontSize: '0.9rem', color: 'var(--text-main)', fontWeight: '500' }}>
-            Ativar envio automático de alertas por email para registos prestes a expirar
+            Ativar envio automático de alertas de email para datas de <strong>Renovação</strong> e <strong>DIU</strong>
           </label>
         </div>
 
