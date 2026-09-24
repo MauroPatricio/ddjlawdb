@@ -149,12 +149,16 @@ jest.spyOn(User, 'findById').mockImplementation((id) => {
 jest.spyOn(Information, 'countDocuments').mockImplementation(async (query = {}) => {
   if (query.$or) {
     const searchTerm = (query.$or[0]?.infoRef?.$regex || '').toLowerCase();
-    return infoStore.filter(
-      (i) =>
-        (i.infoRef || '').toLowerCase().includes(searchTerm) ||
-        (i.brand || '').toLowerCase().includes(searchTerm) ||
-        (i.owner || '').toLowerCase().includes(searchTerm)
-    ).length;
+    if (searchTerm) {
+      return infoStore.filter(
+        (i) =>
+          (i.infoRef || '').toLowerCase().includes(searchTerm) ||
+          (i.brand || '').toLowerCase().includes(searchTerm) ||
+          (i.owner || '').toLowerCase().includes(searchTerm) ||
+          (i.fileType || '').toLowerCase().includes(searchTerm) ||
+          (i.status || '').toLowerCase().includes(searchTerm)
+      ).length;
+    }
   }
   return infoStore.length;
 });
@@ -164,22 +168,35 @@ jest.spyOn(Information, 'create').mockImplementation(async (docs) => {
   const list = Array.isArray(docs) ? docs : [docs];
   const createdList = [];
   for (const doc of list) {
+    const pubDate = doc.publicationDate || doc.date ? new Date(doc.publicationDate || doc.date) : new Date();
     const expDate = doc.expirationDate
       ? new Date(doc.expirationDate)
       : (function () {
-          const d = doc.date ? new Date(doc.date) : new Date();
+          const d = new Date(pubDate);
           d.setFullYear(d.getFullYear() + 10);
           return d;
         })();
+    const renDate = doc.renewalDate ? new Date(doc.renewalDate) : expDate;
+    const diuDateObj = doc.diuDate
+      ? new Date(doc.diuDate)
+      : (function () {
+          const d = new Date(pubDate);
+          d.setFullYear(d.getFullYear() + 5);
+          return d;
+        })();
 
+    const id = (Date.now() + Math.random()).toString();
     const newInfo = {
-      _id: (Date.now() + Math.random()).toString(),
+      _id: id,
       infoRef: doc.infoRef || '',
       fileType: doc.fileType || 'Marca Comercial',
-      date: doc.date ? new Date(doc.date) : new Date(),
-      expirationDate: expDate,
+      publicationDate: pubDate,
+      date: pubDate,
+      renewalDate: renDate,
+      expirationDate: renDate,
+      diuDate: diuDateObj,
       brand: doc.brand || '',
-      clazz: Number(doc.clazz || 0),
+      clazz: doc.clazz !== undefined ? Number(doc.clazz) : 30,
       owner: doc.owner || '',
       status: doc.status || 'Concedido',
       certified: doc.certified || 'Não',
@@ -190,8 +207,13 @@ jest.spyOn(Information, 'create').mockImplementation(async (docs) => {
       logoUrl: doc.logoUrl || '',
       createdBy: doc.createdBy,
       createdAt: new Date(),
+      save: async function () {
+        const idx = infoStore.findIndex((i) => String(i._id) === String(id));
+        if (idx !== -1) infoStore[idx] = { ...infoStore[idx], ...this };
+        return this;
+      },
       deleteOne: async function () {
-        infoStore = infoStore.filter((i) => String(i._id) !== String(this._id));
+        infoStore = infoStore.filter((i) => String(i._id) !== String(id));
       },
     };
     infoStore.push(newInfo);
@@ -204,13 +226,30 @@ jest.spyOn(Information, 'create').mockImplementation(async (docs) => {
 jest.spyOn(Information, 'find').mockImplementation((query = {}) => {
   let filtered = [...infoStore];
   if (query.$or) {
-    const searchTerm = (query.$or[0]?.infoRef?.$regex || '').toLowerCase();
-    filtered = filtered.filter(
-      (i) =>
-        (i.infoRef || '').toLowerCase().includes(searchTerm) ||
-        (i.brand || '').toLowerCase().includes(searchTerm) ||
-        (i.owner || '').toLowerCase().includes(searchTerm)
-    );
+    filtered = filtered.filter((i) => {
+      return query.$or.some((cond) => {
+        if (cond.infoRef?.$regex) {
+          const searchTerm = cond.infoRef.$regex.toLowerCase();
+          return (
+            (i.infoRef || '').toLowerCase().includes(searchTerm) ||
+            (i.brand || '').toLowerCase().includes(searchTerm) ||
+            (i.owner || '').toLowerCase().includes(searchTerm) ||
+            (i.fileType || '').toLowerCase().includes(searchTerm) ||
+            (i.status || '').toLowerCase().includes(searchTerm)
+          );
+        }
+        if (cond.renewalDate?.$lte) {
+          return i.renewalDate && new Date(i.renewalDate) <= new Date(cond.renewalDate.$lte);
+        }
+        if (cond.expirationDate?.$lte) {
+          return i.expirationDate && new Date(i.expirationDate) <= new Date(cond.expirationDate.$lte);
+        }
+        if (cond.diuDate?.$lte) {
+          return i.diuDate && new Date(i.diuDate) <= new Date(cond.diuDate.$lte);
+        }
+        return false;
+      });
+    });
   }
   if (query.expirationDate && query.expirationDate.$lte) {
     const maxDate = new Date(query.expirationDate.$lte);
@@ -230,19 +269,26 @@ jest.spyOn(Information, 'find').mockImplementation((query = {}) => {
 jest.spyOn(Information, 'findById').mockImplementation((id) => {
   const found = infoStore.find((i) => String(i._id) === String(id));
   if (!found) return Promise.resolve(null);
-  return Promise.resolve({
+  const doc = {
     ...found,
+    save: async function () {
+      const idx = infoStore.findIndex((i) => String(i._id) === String(id));
+      if (idx !== -1) infoStore[idx] = { ...infoStore[idx], ...doc };
+      return doc;
+    },
     deleteOne: async function () {
       infoStore = infoStore.filter((i) => String(i._id) !== String(id));
     },
-  });
+  };
+  return Promise.resolve(doc);
 });
 
 // Mock de Information.findByIdAndUpdate
 jest.spyOn(Information, 'findByIdAndUpdate').mockImplementation(async (id, updateFields) => {
   const index = infoStore.findIndex((i) => String(i._id) === String(id));
   if (index === -1) return null;
-  infoStore[index] = { ...infoStore[index], ...updateFields };
+  const fieldsToSet = updateFields.$set ? updateFields.$set : updateFields;
+  infoStore[index] = { ...infoStore[index], ...fieldsToSet };
   return infoStore[index];
 });
 

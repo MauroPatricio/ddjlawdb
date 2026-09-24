@@ -49,6 +49,45 @@ describe('📋 CRUD de Informações (SIGINFO Endpoints)', () => {
     expect(response.body.success).toBe(true);
     expect(response.body.data.infoRef).toBe('8811/2026');
     expect(response.body.data.brand).toBe('NESTLÉ MOÇAMBIQUE');
+    expect(response.body.data.clazz).toBe(30);
+  });
+
+  test('Deve incluir e validar o campo classe (clazz) no registo de informação', async () => {
+    const infoWithClazz = {
+      infoRef: '7722/2026',
+      fileType: 'Marca Comercial',
+      brand: 'DIKHOKHO',
+      clazz: 30,
+      owner: 'Hessitany De Deus',
+      status: 'Recusado',
+      certified: 'Não',
+    };
+
+    const response = await request(app)
+      .post('/api/v1/informations')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send(infoWithClazz);
+
+    expect(response.status).toBe(201);
+    expect(response.body.success).toBe(true);
+    expect(response.body.data.clazz).toBe(30);
+  });
+
+  test('Deve atualizar o campo classe (clazz) de um registo existente', async () => {
+    const created = await Information.create({
+      infoRef: '5544/2026',
+      brand: 'BRAND X',
+      clazz: 5,
+      owner: 'COMPANY X',
+    });
+
+    const response = await request(app)
+      .put(`/api/v1/informations/${created._id}`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ clazz: 42 });
+
+    expect(response.status).toBe(200);
+    expect(response.body.data.clazz).toBe(42);
   });
 
   test('Deve listar todas as informações com paginação (Read All)', async () => {
@@ -65,6 +104,7 @@ describe('📋 CRUD de Informações (SIGINFO Endpoints)', () => {
     expect(response.body.success).toBe(true);
     expect(response.body.total).toBe(2);
     expect(response.body.data.length).toBe(2);
+    expect(response.body.data[0].clazz).toBeDefined();
   });
 
   test('Deve filtrar informações por termo de pesquisa (Search)', async () => {
@@ -80,6 +120,7 @@ describe('📋 CRUD de Informações (SIGINFO Endpoints)', () => {
     expect(response.status).toBe(200);
     expect(response.body.total).toBe(1);
     expect(response.body.data[0].brand).toBe('CHOLESTRO');
+    expect(response.body.data[0].clazz).toBe(30);
   });
 
   test('Deve obter os detalhes de um registo específico por ID (Read One)', async () => {
@@ -96,6 +137,7 @@ describe('📋 CRUD de Informações (SIGINFO Endpoints)', () => {
 
     expect(response.status).toBe(200);
     expect(response.body.data.brand).toBe('SENSODYNE');
+    expect(response.body.data.clazz).toBe(3);
   });
 
   test('Deve atualizar os dados de uma informação existente (Update)', async () => {

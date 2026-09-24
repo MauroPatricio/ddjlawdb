@@ -60,7 +60,7 @@ export const InformationFormModal = ({ isOpen, onClose, onSave, initialData }) =
         renewalDate: renStr,
         diuDate: diuStr,
         brand: initialData.brand || '',
-        clazz: initialData.clazz || '30',
+        clazz: initialData.clazz !== undefined && initialData.clazz !== null ? String(initialData.clazz) : '30',
         owner: initialData.owner || '',
         status: initialData.status || 'Concedido',
         certified: initialData.certified || 'Não',
@@ -197,7 +197,7 @@ export const InformationFormModal = ({ isOpen, onClose, onSave, initialData }) =
             )}
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
             <div>
               <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.4rem' }}>
                 Informação Ref. *
@@ -224,7 +224,9 @@ export const InformationFormModal = ({ isOpen, onClose, onSave, initialData }) =
                 <option value="Outro">Outro</option>
               </select>
             </div>
+          </div>
 
+          <div style={{ display: 'grid', gridTemplateColumns: '2.5fr 1fr', gap: '1rem' }}>
             <div>
               <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.4rem' }}>
                 Marca / Nome *
@@ -237,6 +239,23 @@ export const InformationFormModal = ({ isOpen, onClose, onSave, initialData }) =
                 value={formData.brand}
                 onChange={handleChange}
                 required
+              />
+            </div>
+
+            <div>
+              <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.4rem' }}>
+                Classe (NICE) *
+              </label>
+              <input
+                type="number"
+                name="clazz"
+                className="input-field"
+                placeholder="ex: 30"
+                value={formData.clazz}
+                onChange={handleChange}
+                required
+                min="1"
+                max="45"
               />
             </div>
           </div>
