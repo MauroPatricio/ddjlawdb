@@ -61,6 +61,7 @@ export const sendEmail = async ({ to, subject, html, text }) => {
     };
   } catch (err) {
     console.error(`❌ Erro ao enviar email via SMTP: ${err.message}`);
-    throw err;
+    // Não re-lançar: erros SMTP/rede não devem crashar o servidor
+    return { success: false, mode: 'real', error: err.message };
   }
 };

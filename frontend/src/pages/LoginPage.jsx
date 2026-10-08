@@ -4,8 +4,8 @@ import { ShieldCheck, LogIn, Key, Mail, Eye, EyeOff } from 'lucide-react';
 
 export const LoginPage = () => {
   const { login } = useAuth();
-  const [email, setEmail] = useState('mauro.patricio1@gmail.com');
-  const [password, setPassword] = useState('Teste1');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -21,11 +21,6 @@ export const LoginPage = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleQuickLogin = (userEmail, userPass) => {
-    setEmail(userEmail);
-    setPassword(userPass);
   };
 
   return (
@@ -123,27 +118,6 @@ export const LoginPage = () => {
             <LogIn size={20} /> {loading ? 'A autenticar...' : 'Iniciar Sessão'}
           </button>
         </form>
-
-        {/* Seleção Rápida de Papéis RBAC para Demonstração */}
-        <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border-color)' }}>
-          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.75rem', textAlign: 'center' }}>
-            Contas de Teste Rápidas (Níveis de Acesso RBAC):
-          </p>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '0.4rem' }}>
-            <button type="button" onClick={() => handleQuickLogin('mauro.patricio1@gmail.com', 'Teste1')} className="btn-secondary" style={{ fontSize: '0.72rem', padding: '0.4rem 0.2rem' }}>
-              👤 Mauro
-            </button>
-            <button type="button" onClick={() => handleQuickLogin('admin@ddjlaw.co.mz', 'Admin123!')} className="btn-secondary" style={{ fontSize: '0.72rem', padding: '0.4rem 0.2rem' }}>
-              👑 Admin
-            </button>
-            <button type="button" onClick={() => handleQuickLogin('gestor@ddjlaw.co.mz', 'Gestor123!')} className="btn-secondary" style={{ fontSize: '0.72rem', padding: '0.4rem 0.2rem' }}>
-              🛠️ Gestor
-            </button>
-            <button type="button" onClick={() => handleQuickLogin('leitor@ddjlaw.co.mz', 'Leitor123!')} className="btn-secondary" style={{ fontSize: '0.72rem', padding: '0.4rem 0.2rem' }}>
-              👁️ Leitor
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   );

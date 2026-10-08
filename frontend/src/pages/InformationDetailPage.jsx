@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { api } from '../services/api';
+import { api, getFileUrl } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { ArrowLeft, FileText, Download, Printer, Trash2 } from 'lucide-react';
 
@@ -167,7 +167,7 @@ export const InformationDetailPage = ({ infoId, onBack, onDelete }) => {
       {data.logoUrl && (
         <div style={{ background: '#ffffff', padding: '1.25rem', borderRadius: 'var(--radius-md)', border: '1px solid #cbd5e1', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
           <img
-            src={`http://localhost:5000${data.logoUrl}`}
+            src={getFileUrl(data.logoUrl)}
             alt={data.brand}
             style={{ maxHeight: '90px', maxWidth: '160px', objectFit: 'contain', borderRadius: '6px', border: '1px solid #e2e8f0', padding: '4px', background: '#fff' }}
           />
@@ -198,7 +198,7 @@ export const InformationDetailPage = ({ infoId, onBack, onDelete }) => {
             </div>
           </div>
           <a
-            href={`http://localhost:5000${data.documentUrl}`}
+            href={getFileUrl(data.documentUrl)}
             target="_blank"
             rel="noopener noreferrer"
             className="btn-primary"

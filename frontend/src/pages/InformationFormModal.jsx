@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Upload, Save, FileCheck, Image as ImageIcon, Calendar } from 'lucide-react';
+import { getFileUrl } from '../services/api';
 
 const formatYMD = (val) => {
   if (!val) return '';
@@ -69,7 +70,7 @@ export const InformationFormModal = ({ isOpen, onClose, onSave, initialData }) =
       });
       setSelectedFile(null);
       setSelectedLogo(null);
-      setLogoPreview(initialData.logoUrl ? `http://localhost:5000${initialData.logoUrl}` : '');
+      setLogoPreview(initialData.logoUrl ? getFileUrl(initialData.logoUrl) : '');
     } else {
       const defaultPub = new Date();
       const defaultRen = new Date(defaultPub);

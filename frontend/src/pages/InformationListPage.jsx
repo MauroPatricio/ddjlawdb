@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { api } from '../services/api';
+import { api, getFileUrl } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { Eye, Edit, Trash2, FileSpreadsheet, Plus, FileText, Search } from 'lucide-react';
 import { InformationFormModal } from './InformationFormModal';
@@ -64,15 +63,11 @@ export const InformationListPage = () => {
   const handleExportExcel = async () => {
     setExporting(true);
     try {
-      const token = localStorage.getItem('ddjlaw_token');
-      const response = await axios.get('http://localhost:5000/api/v1/informations/export/excel', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const data = await api.get('/informations/export/excel', {
         responseType: 'blob',
       });
 
-      const blob = new Blob([response.data], {
+      const blob = data instanceof Blob ? data : new Blob([data], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       });
       const url = window.URL.createObjectURL(blob);
@@ -235,7 +230,7 @@ export const InformationListPage = () => {
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                           {info.logoUrl ? (
                             <img
-                              src={`http://localhost:5000${info.logoUrl}`}
+                              src={getFileUrl(info.logoUrl)}
                               alt={info.brand}
                               style={{ width: '32px', height: '32px', objectFit: 'contain', borderRadius: '6px', background: '#ffffff', padding: '2px', border: '1px solid var(--border-color)' }}
                             />
@@ -285,7 +280,7 @@ export const InformationListPage = () => {
 
                           {info.documentUrl && (
                             <a
-                              href={`http://localhost:5000${info.documentUrl}`}
+                              href={getFileUrl(info.documentUrl)}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="btn-secondary"

@@ -157,7 +157,8 @@ export const runExpirationCheck = async (force = false) => {
     };
   } catch (err) {
     console.error('❌ Erro na execução da verificação de expiração:', err.message);
-    throw err;
+    // Não re-lançar o erro para evitar crash do servidor por erros de rede/SMTP
+    return { sent: false, error: err.message };
   }
 };
 
@@ -167,8 +168,12 @@ export const startNotificationScheduler = () => {
   console.log('⏰ A iniciar serviço agendador de notificações de expiração...');
 
   // Executar uma verificação inicial após 10 segundos
-  setTimeout(() => {
-    runExpirationCheck().catch((err) => console.error('Erro na verificação de expiração inicial:', err.message));
+  setTimeout(async () => {
+    try {
+      await runExpirationCheck();
+    } catch (err) {
+      console.error('Erro na verificação de expiração inicial:', err.message);
+    }
   }, 10000);
 
   // Intervalo periódico de verificação a cada 1 hora
@@ -183,7 +188,7 @@ export const startNotificationScheduler = () => {
           const targetHourPrefix = setting.sendHour.split(':')[0] + ':00';
 
           if (currentHour === targetHourPrefix) {
-            runExpirationCheck();
+            runExpirationCheck().catch((err) => console.error('Erro agendado:', err.message));
           }
         })
         .catch((err) => console.error('Erro no agendador de expiração:', err.message));
