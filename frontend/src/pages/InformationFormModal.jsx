@@ -19,14 +19,18 @@ export const InformationFormModal = ({ isOpen, onClose, onSave, initialData }) =
   const [formData, setFormData] = useState({
     infoRef: '',
     fileType: 'Marca Comercial',
+    applicationDate: '',
     publicationDate: formatYMD(new Date()),
+    concessionDate: '',
     renewalDate: '',
     diuDate: '',
     brand: '',
     clazz: '30',
     owner: '',
+    country: '',
     status: 'Concedido',
     certified: 'Não',
+    modification: '',
     address: '',
     observation: '',
   });
@@ -57,14 +61,18 @@ export const InformationFormModal = ({ isOpen, onClose, onSave, initialData }) =
       setFormData({
         infoRef: initialData.infoRef || '',
         fileType: initialData.fileType || 'Marca Comercial',
+        applicationDate: formatYMD(initialData.applicationDate),
         publicationDate: pubStr,
+        concessionDate: formatYMD(initialData.concessionDate),
         renewalDate: renStr,
         diuDate: diuStr,
         brand: initialData.brand || '',
         clazz: initialData.clazz !== undefined && initialData.clazz !== null ? String(initialData.clazz) : '30',
         owner: initialData.owner || '',
+        country: initialData.country || '',
         status: initialData.status || 'Concedido',
         certified: initialData.certified || 'Não',
+        modification: initialData.modification || '',
         address: initialData.address || '',
         observation: initialData.observation || '',
       });
@@ -81,14 +89,18 @@ export const InformationFormModal = ({ isOpen, onClose, onSave, initialData }) =
       setFormData({
         infoRef: '',
         fileType: 'Marca Comercial',
+        applicationDate: '',
         publicationDate: formatYMD(defaultPub),
+        concessionDate: '',
         renewalDate: formatYMD(defaultRen),
         diuDate: formatYMD(defaultDiu),
         brand: '',
         clazz: '30',
         owner: '',
+        country: '',
         status: 'Concedido',
         certified: 'Não',
+        modification: '',
         address: '',
         observation: '',
       });
@@ -164,7 +176,7 @@ export const InformationFormModal = ({ isOpen, onClose, onSave, initialData }) =
       zIndex: 1000,
       padding: '1rem'
     }}>
-      <div className="card" style={{ maxWidth: '780px', width: '100%', maxHeight: '90vh', overflowY: 'auto', padding: '2rem' }}>
+      <div className="card" style={{ maxWidth: '820px', width: '100%', maxHeight: '90vh', overflowY: 'auto', padding: '2rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px solid var(--border-color)' }}>
           <h2 style={{ fontSize: '1.25rem', fontWeight: '700' }}>
             {initialData ? 'Editar Registo de Informação' : 'Nova Informação (SIGINFO)'}
@@ -198,10 +210,11 @@ export const InformationFormModal = ({ isOpen, onClose, onSave, initialData }) =
             )}
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+          {/* Dados Principais: Application Number, Trademark, Class */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 2fr 0.8fr', gap: '1rem' }}>
             <div>
               <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.4rem' }}>
-                Informação Ref. *
+                Application Number / N.º Registo *
               </label>
               <input
                 type="text"
@@ -216,21 +229,7 @@ export const InformationFormModal = ({ isOpen, onClose, onSave, initialData }) =
 
             <div>
               <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.4rem' }}>
-                Tipo de Ficheiro *
-              </label>
-              <select name="fileType" className="select-field" value={formData.fileType} onChange={handleChange}>
-                <option value="Marca Comercial">Marca Comercial</option>
-                <option value="Patente de Invenção">Patente de Invenção</option>
-                <option value="Desenho Industrial">Desenho Industrial</option>
-                <option value="Outro">Outro</option>
-              </select>
-            </div>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '2.5fr 1fr', gap: '1rem' }}>
-            <div>
-              <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.4rem' }}>
-                Marca / Nome *
+                Trademark / Marca *
               </label>
               <input
                 type="text"
@@ -245,7 +244,7 @@ export const InformationFormModal = ({ isOpen, onClose, onSave, initialData }) =
 
             <div>
               <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.4rem' }}>
-                Classe (NICE) *
+                Class / Classe (NICE) *
               </label>
               <input
                 type="number"
@@ -261,16 +260,68 @@ export const InformationFormModal = ({ isOpen, onClose, onSave, initialData }) =
             </div>
           </div>
 
-          {/* As 3 Datas Obrigatórias do Sistema */}
+          {/* Status, Certificado, Nacionalidade */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1.5fr', gap: '1rem' }}>
+            <div>
+              <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.4rem' }}>
+                Status / Estado *
+              </label>
+              <select name="status" className="select-field" value={formData.status} onChange={handleChange}>
+                <option value="Concedido">Concedido</option>
+                <option value="Publicado">Publicado</option>
+                <option value="Pendente">Pendente</option>
+                <option value="Recusado">Recusado</option>
+              </select>
+            </div>
+
+            <div>
+              <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.4rem' }}>
+                Certificate / Certificado
+              </label>
+              <select name="certified" className="select-field" value={formData.certified} onChange={handleChange}>
+                <option value="Não">Não</option>
+                <option value="Sim">Sim</option>
+              </select>
+            </div>
+
+            <div>
+              <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.4rem' }}>
+                Country / Nacionalidade
+              </label>
+              <input
+                type="text"
+                name="country"
+                className="input-field"
+                placeholder="ex: Moçambique, África do Sul, EUA"
+                value={formData.country}
+                onChange={handleChange}
+              />
+            </div>
+          </div>
+
+          {/* Secção de Datas Legais & Prazos */}
           <div style={{ background: '#f8fafc', padding: '1.1rem', borderRadius: 'var(--radius-md)', border: '1px solid #e2e8f0' }}>
             <span style={{ fontSize: '0.85rem', fontWeight: '700', color: '#0284c7', display: 'block', marginBottom: '0.75rem' }}>
-              📅 Controlo de Datas de Registo & Prazos Legais (DIU / Renovação)
+              📅 Controlo de Datas de Registo & Prazos Legais (Application, Publication, Concession, Renewal, DIU)
             </span>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
               <div>
                 <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '0.4rem', fontWeight: '600' }}>
-                  <Calendar size={14} color="#0284c7" /> Data de Publicação *
+                  <Calendar size={14} color="#64748b" /> Application Date / Aplicação
+                </label>
+                <input
+                  type="date"
+                  name="applicationDate"
+                  className="input-field"
+                  value={formData.applicationDate}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div>
+                <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '0.4rem', fontWeight: '600' }}>
+                  <Calendar size={14} color="#0284c7" /> Publication Date / Publicação *
                 </label>
                 <input
                   type="date"
@@ -284,7 +335,22 @@ export const InformationFormModal = ({ isOpen, onClose, onSave, initialData }) =
 
               <div>
                 <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '0.4rem', fontWeight: '600' }}>
-                  <Calendar size={14} color="#d97706" /> Data de Renovação *
+                  <Calendar size={14} color="#10b981" /> Concession Date / Concessão
+                </label>
+                <input
+                  type="date"
+                  name="concessionDate"
+                  className="input-field"
+                  value={formData.concessionDate}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div>
+                <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '0.4rem', fontWeight: '600' }}>
+                  <Calendar size={14} color="#d97706" /> Renewal Date / Renovação *
                 </label>
                 <input
                   type="date"
@@ -299,7 +365,7 @@ export const InformationFormModal = ({ isOpen, onClose, onSave, initialData }) =
 
               <div>
                 <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '0.4rem', fontWeight: '600' }}>
-                  <Calendar size={14} color="#2563eb" /> Data para DIU *
+                  <Calendar size={14} color="#2563eb" /> DIU Date / Data para DIU *
                 </label>
                 <input
                   type="date"
@@ -314,10 +380,11 @@ export const InformationFormModal = ({ isOpen, onClose, onSave, initialData }) =
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '1rem' }}>
+          {/* Proprietário e Modificações */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1.5fr', gap: '1rem' }}>
             <div>
               <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.4rem' }}>
-                Proprietário *
+                Owner / Proprietário *
               </label>
               <input
                 type="text"
@@ -332,36 +399,31 @@ export const InformationFormModal = ({ isOpen, onClose, onSave, initialData }) =
 
             <div>
               <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.4rem' }}>
-                Estado
+                Modification / Alteração
               </label>
-              <select name="status" className="select-field" value={formData.status} onChange={handleChange}>
-                <option value="Concedido">Concedido</option>
-                <option value="Publicado">Publicado</option>
-                <option value="Pendente">Pendente</option>
-                <option value="Recusado">Recusado</option>
-              </select>
-            </div>
-
-            <div>
-              <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.4rem' }}>
-                Certificado
-              </label>
-              <select name="certified" className="select-field" value={formData.certified} onChange={handleChange}>
-                <option value="Não">Não</option>
-                <option value="Sim">Sim</option>
+              <select
+                name="modification"
+                className="select-field"
+                value={formData.modification}
+                onChange={handleChange}
+              >
+                <option value="">(Nenhuma / None)</option>
+                <option value="Assigned to">Assigned to</option>
+                <option value="Change of name of proprietary">Change of name of proprietary</option>
+                <option value="Change of address of the proprietary">Change of address of the proprietary</option>
               </select>
             </div>
           </div>
 
           <div>
             <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.4rem' }}>
-              Endereço
+              Address / Endereço Completo do Proprietário
             </label>
             <input
               type="text"
               name="address"
               className="input-field"
-              placeholder="Endereço completo..."
+              placeholder="ex: Parc Nicol, Building No. 1, 3001 William Nicol Drive, Bryanston, 2021"
               value={formData.address}
               onChange={handleChange}
             />
@@ -369,13 +431,13 @@ export const InformationFormModal = ({ isOpen, onClose, onSave, initialData }) =
 
           <div>
             <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.4rem' }}>
-              Observação
+              Observação / Notas Adicionais
             </label>
             <textarea
               name="observation"
               className="input-field"
               rows={2}
-              placeholder="Observações adicionais, datas de renovação, etc."
+              placeholder="Observações adicionais sobre o processo..."
               value={formData.observation}
               onChange={handleChange}
             />

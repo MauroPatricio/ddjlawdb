@@ -181,16 +181,42 @@ export const getInformations = async (req, res, next) => {
     const page = parseInt(req.query.page, 10) || 1;
     const limit = parseInt(req.query.limit, 10) || 10;
     const search = req.query.search || '';
+    const ownerFilter = req.query.owner || '';
+    const brandFilter = req.query.brand || '';
+    const countryFilter = req.query.country || '';
 
     const query = {};
+    const conditions = [];
+
     if (search) {
-      query.$or = [
-        { infoRef: { $regex: search, $options: 'i' } },
-        { brand: { $regex: search, $options: 'i' } },
-        { owner: { $regex: search, $options: 'i' } },
-        { fileType: { $regex: search, $options: 'i' } },
-        { status: { $regex: search, $options: 'i' } },
-      ];
+      conditions.push({
+        $or: [
+          { infoRef: { $regex: search, $options: 'i' } },
+          { brand: { $regex: search, $options: 'i' } },
+          { owner: { $regex: search, $options: 'i' } },
+          { country: { $regex: search, $options: 'i' } },
+          { fileType: { $regex: search, $options: 'i' } },
+          { status: { $regex: search, $options: 'i' } },
+          { modification: { $regex: search, $options: 'i' } },
+          { address: { $regex: search, $options: 'i' } },
+        ],
+      });
+    }
+
+    if (ownerFilter) {
+      conditions.push({ owner: { $regex: ownerFilter, $options: 'i' } });
+    }
+    if (brandFilter) {
+      conditions.push({ brand: { $regex: brandFilter, $options: 'i' } });
+    }
+    if (countryFilter) {
+      conditions.push({ country: { $regex: countryFilter, $options: 'i' } });
+    }
+
+    if (conditions.length === 1) {
+      Object.assign(query, conditions[0]);
+    } else if (conditions.length > 1) {
+      query.$and = conditions;
     }
 
     const total = await Information.countDocuments(query);
@@ -281,9 +307,13 @@ export const createInformation = async (req, res, next) => {
       renewalDate,
       expirationDate,
       diuDate,
+      applicationDate,
+      concessionDate,
       brand,
       clazz,
       owner,
+      country,
+      modification,
       status,
       certified,
       address,
@@ -323,6 +353,9 @@ export const createInformation = async (req, res, next) => {
       diuDateObj.setFullYear(diuDateObj.getFullYear() + 5);
     }
 
+    const appDate = applicationDate ? new Date(applicationDate) : undefined;
+    const concDate = concessionDate ? new Date(concessionDate) : undefined;
+
     const information = await Information.create({
       infoRef,
       fileType,
@@ -331,9 +364,13 @@ export const createInformation = async (req, res, next) => {
       renewalDate: renDate,
       expirationDate: renDate,
       diuDate: diuDateObj,
+      applicationDate: appDate,
+      concessionDate: concDate,
       brand,
       clazz: Number(clazz),
       owner,
+      country: country || '',
+      modification: modification || '',
       status: status || 'Concedido',
       certified: certified || 'Não',
       address: address || '',
@@ -382,6 +419,18 @@ export const updateInformation = async (req, res, next) => {
       if (!isNaN(parsedDiu.getTime())) {
         updateFields.diuDate = parsedDiu;
       }
+    }
+
+    if (updateFields.applicationDate !== undefined && updateFields.applicationDate !== '') {
+      updateFields.applicationDate = new Date(updateFields.applicationDate);
+    } else if (updateFields.applicationDate === '') {
+      updateFields.applicationDate = null;
+    }
+
+    if (updateFields.concessionDate !== undefined && updateFields.concessionDate !== '') {
+      updateFields.concessionDate = new Date(updateFields.concessionDate);
+    } else if (updateFields.concessionDate === '') {
+      updateFields.concessionDate = null;
     }
 
     if (req.files) {
@@ -461,40 +510,90 @@ export const exportExcel = async (req, res, next) => {
 
     const worksheet = workbook.addWorksheet('Nossas Informações');
 
-    // Estilo dos Cabeçalhos
+    // Definir colunas da folha Excel
     worksheet.columns = [
-      { header: 'Informação Ref.', key: 'infoRef', width: 18 },
-      { header: 'Tipo de Ficheiro', key: 'fileType', width: 20 },
-      { header: 'Data Publicação', key: 'publicationDate', width: 16 },
-      { header: 'Data Renovação', key: 'renewalDate', width: 16 },
-      { header: 'Data para DIU', key: 'diuDate', width: 16 },
-      { header: 'Marca', key: 'brand', width: 30 },
-      { header: 'Classe', key: 'clazz', width: 10 },
-      { header: 'Proprietário', key: 'owner', width: 40 },
-      { header: 'Estado', key: 'status', width: 15 },
-      { header: 'Certificado', key: 'certified', width: 12 },
-      { header: 'Endereço', key: 'address', width: 45 },
-      { header: 'Observação', key: 'observation', width: 35 },
+      { key: 'infoRef', width: 22 },
+      { key: 'brand', width: 30 },
+      { key: 'clazz', width: 10 },
+      { key: 'status', width: 16 },
+      { key: 'applicationDate', width: 18 },
+      { key: 'publicationDate', width: 18 },
+      { key: 'concessionDate', width: 18 },
+      { key: 'renewalDate', width: 18 },
+      { key: 'diuDate', width: 16 },
+      { key: 'owner', width: 40 },
+      { key: 'country', width: 20 },
+      { key: 'certified', width: 14 },
+      { key: 'modification', width: 35 },
+      { key: 'address', width: 45 },
+      { key: 'observation', width: 35 },
     ];
 
-    // Estilizar linha de cabeçalho
-    const headerRow = worksheet.getRow(1);
-    headerRow.eachCell((cell) => {
-      cell.font = { bold: true, color: { argb: 'FFFFFF' }, size: 11 };
-      cell.fill = {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: '1E293B' },
-      };
-      cell.alignment = { vertical: 'middle', horizontal: 'center' };
+    // Linha 1: Inglês
+    const headerRowEN = worksheet.addRow([
+      'Application Number',
+      'Trademark',
+      'Class',
+      'Status',
+      'Application Date',
+      'Publication date',
+      'Concession Date',
+      'Renewal date',
+      'DIU',
+      'Owner',
+      'Country',
+      'Certificate',
+      'Modification /',
+      'Address',
+      'Observation',
+    ]);
+
+    // Linha 2: Português
+    const headerRowPT = worksheet.addRow([
+      'Numero de Registo',
+      'Marca',
+      'Classe',
+      'Estado',
+      'Data de aplicação',
+      'Data de publicacao',
+      'Data de Concessão',
+      'DAta da renovacao',
+      'DIU',
+      'Proprietário',
+      'Nacionalidade',
+      'Certificado',
+      'Alteração',
+      'Endereço',
+      'Observação',
+    ]);
+
+    // Estilizar as duas linhas de cabeçalho
+    [headerRowEN, headerRowPT].forEach((row, idx) => {
+      row.eachCell((cell) => {
+        cell.font = { bold: true, color: { argb: 'FFFFFF' }, size: idx === 0 ? 11 : 10 };
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: idx === 0 ? '1E293B' : '334155' },
+        };
+        cell.alignment = { vertical: 'middle', horizontal: 'center' };
+      });
     });
 
     // Adicionar Dados
     informations.forEach((info) => {
+      const appDateStr = info.applicationDate
+        ? new Date(info.applicationDate).toISOString().split('T')[0]
+        : '';
+
       const pubDateStr = info.publicationDate
         ? new Date(info.publicationDate).toISOString().split('T')[0]
         : info.date
         ? new Date(info.date).toISOString().split('T')[0]
+        : '';
+
+      const concDateStr = info.concessionDate
+        ? new Date(info.concessionDate).toISOString().split('T')[0]
         : '';
 
       const renDateStr = info.renewalDate
@@ -507,15 +606,18 @@ export const exportExcel = async (req, res, next) => {
 
       worksheet.addRow({
         infoRef: info.infoRef,
-        fileType: info.fileType,
-        publicationDate: pubDateStr,
-        renewalDate: renDateStr,
-        diuDate: diuDateStr,
         brand: info.brand,
         clazz: info.clazz,
-        owner: info.owner,
         status: info.status,
+        applicationDate: appDateStr,
+        publicationDate: pubDateStr,
+        concessionDate: concDateStr,
+        renewalDate: renDateStr,
+        diuDate: diuDateStr,
+        owner: info.owner,
+        country: info.country || '',
         certified: info.certified,
+        modification: info.modification || '',
         address: info.address || '',
         observation: info.observation || '',
       });

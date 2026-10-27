@@ -54,6 +54,22 @@ const informationSchema = new mongoose.Schema(
       enum: ['Sim', 'Não'],
       default: 'Não',
     },
+    applicationDate: {
+      type: Date,
+    },
+    concessionDate: {
+      type: Date,
+    },
+    country: {
+      type: String,
+      default: '',
+      trim: true,
+    },
+    modification: {
+      type: String,
+      default: '',
+      trim: true,
+    },
     address: {
       type: String,
       default: '',
